@@ -1,67 +1,130 @@
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f9f9f9;
-    color: #333;
+    margin: 0;
+    padding: 0;
+    font-family: "Cinzel", serif;
+    background: linear-gradient(to bottom, #1a1a1a, #3b2e2e);
+    color: #f0e6d2;
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    padding: 40px 0;
-    margin: 0;
+    min-height: 100vh;
+    padding-top: 50px;
 }
 
+/* Container central */
 .container {
     width: 95%;
-    max-width: 900px;
+    max-width: 1200px;
     text-align: center;
 }
 
+/* Titlu */
 h1 {
+    font-size: 2.5em;
     margin-bottom: 20px;
-    color: #2c3e50;
+    color: #f1c40f; /* accent aur */
+    text-shadow: 2px 2px 4px #000;
 }
 
-button {
-    background-color: #3498db;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    font-size: 16px;
-    border-radius: 6px;
+/* Buton Schimbă Casa */
+button#randomBtn {
+    background-color: #8e6b3b;
+    color: #f0e6d2;
+    border: 2px solid #f1c40f;
+    padding: 12px 25px;
+    font-size: 1.1em;
+    border-radius: 8px;
     cursor: pointer;
-    transition: 0.3s;
-    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    margin-bottom: 25px;
+    font-family: "Cinzel", serif;
 }
 
-button:hover {
-    background-color: #2980b9;
+button#randomBtn:hover {
+    background-color: #b28c5c;
+    transform: scale(1.05);
+    box-shadow: 0 0 10px #f1c40f;
 }
 
+/* Container tabel */
 .table-container {
     overflow-x: auto;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    background-color: rgba(30, 30, 30, 0.95);
+    padding: 10px;
 }
 
+/* Tabel */
 table {
     width: 100%;
     border-collapse: collapse;
-    background-color: white;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    border-radius: 8px;
-    overflow: hidden;
+    transition: all 0.5s ease;
 }
 
-th, td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
-
+/* Header tabel */
 th {
-    background-color: #ecf0f1;
-    color: #2c3e50;
+    background-color: #3e2e2e;
+    color: #f1c40f;
+    font-size: 1em;
+    padding: 12px;
+    text-align: left;
+    border-bottom: 2px solid #f1c40f;
+    text-shadow: 1px 1px 2px #000;
+    position: sticky;
+    top: 0;
+    z-index: 1;
 }
 
+/* Celule tabel */
+td {
+    padding: 10px;
+    border-bottom: 1px solid #555;
+    text-align: left;
+    vertical-align: middle;
+    font-size: 0.95em;
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+/* Highlight la schimbarea casei */
+td.change-highlight {
+    background-color: rgba(241, 196, 15, 0.3);
+    color: #fff;
+    transition: background-color 0.7s ease, color 0.7s ease;
+}
+
+/* Imagini simbol / stemă */
 td img {
     width: 50px;
     height: 50px;
     object-fit: contain;
+    border: 2px solid #f1c40f;
+    border-radius: 5px;
+    transition: transform 0.5s ease;
+}
+
+td img:hover {
+    transform: scale(1.2) rotate(5deg);
+}
+
+/* Rânduri tabel */
+tr:nth-child(even) {
+    background-color: rgba(50, 50, 50, 0.6);
+}
+
+tr:nth-child(odd) {
+    background-color: rgba(40, 40, 40, 0.6);
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+    th, td {
+        font-size: 0.85em;
+        padding: 8px;
+    }
+
+    td img {
+        width: 40px;
+        height: 40px;
+    }
 }
