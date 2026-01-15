@@ -1,0 +1,1 @@
+"# aceasta aplicatie creeaza informatii intr-un tabel despre fiecare casa din Game of thrones.  Este folosita https://anapioficeandfire.com/api/houses API, apasati pe "Schimbare casa" pentru a schimba casa."
