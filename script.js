@@ -4,14 +4,14 @@ const randomBtn = document.getElementById('randomBtn');
 
 let allHouses = [];
 
-// Funcție pentru a prelua toate casele (paginat)
+// Fetch pentru toate casele (paginat)
 async function fetchAllHouses() {
     try {
         let houses = [];
         let page = 1;
         let keepFetching = true;
 
-        while (keepFetching && page <= 10) { // max 10 pagini x 50 case = 500 case
+        while (keepFetching && page <= 10) { // max 500 case
             const response = await fetch(`${API_URL}?page=${page}&pageSize=50`);
             const data = await response.json();
             console.log(`Pagina ${page} încărcată, case:`, data.length);
@@ -32,33 +32,61 @@ async function fetchAllHouses() {
     }
 }
 
-// Funcție pentru a genera un URL pentru simbol / stemă (folosim placeholder dacă nu există)
+// Preia numele real dintr-un URL (pentru currentLord, heir, overlord)
+async function fetchNameFromURL(url) {
+    if (!url || url.trim() === "") return "N/A";
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+        return data.name || "N/A";
+    } catch (error) {
+        console.error("Eroare la fetch URL:", url, error);
+        return "N/A";
+    }
+}
+
+// Preia numele dintr-un array de URL-uri (pentru cadetBranches, swornMembers)
+async function fetchNamesFromURLs(urls) {
+    if (!urls || urls.length === 0) return "N/A";
+    try {
+        const names = await Promise.all(
+            urls.map(async (url) => {
+                const res = await fetch(url);
+                const data = await res.json();
+                return data.name || "N/A";
+            })
+        );
+        return names.join(', ');
+    } catch (error) {
+        console.error("Eroare la fetch multiple URLs:", error);
+        return "N/A";
+    }
+}
+
+// Generează un simbol / stemă pentru casă (placeholder dacă nu există coatOfArms real)
 function generateSymbolURL(coatOfArms, houseName) {
     if (coatOfArms && coatOfArms.trim() !== '') {
-        // Dacă coatOfArms are link real, îl putem transforma în imagine cu placeholder (simplificat)
-        // Din păcate API-ul oferă text, așa că folosim placeholder cu inițiala casei
         return `https://via.placeholder.com/50/8e6b3b/f0e6d2?text=${encodeURIComponent(houseName.charAt(0))}`;
     } else {
         return `https://via.placeholder.com/50/8e6b3b/f0e6d2?text=${encodeURIComponent(houseName.charAt(0))}`;
     }
 }
 
-// Funcție pentru a popula tabelul cu o casă
-function displayHouse(house) {
-    // Aplicăm efect vizual pentru schimbare
+// Populează tabelul cu datele unei case
+async function displayHouse(house) {
     tableBody.innerHTML = ''; // reset
-    const symbolUrl = generateSymbolURL(house.coatOfArms, house.name);
 
     const tr = document.createElement('tr');
 
-    // Cream fiecare td
+    // Simbol / stemă
     const tdSymbol = document.createElement('td');
     const img = document.createElement('img');
-    img.src = symbolUrl;
+    img.src = generateSymbolURL(house.coatOfArms, house.name);
     img.alt = house.name;
     tdSymbol.appendChild(img);
     tdSymbol.classList.add('change-highlight');
 
+    // Nume, region, words, titles, seats
     const tdName = document.createElement('td');
     tdName.textContent = house.name || 'N/A';
     tdName.classList.add('change-highlight');
@@ -79,18 +107,20 @@ function displayHouse(house) {
     tdSeats.textContent = house.seats.length ? house.seats.join(', ') : 'N/A';
     tdSeats.classList.add('change-highlight');
 
+    // URL fields preluate din API
     const tdCurrentLord = document.createElement('td');
-    tdCurrentLord.textContent = house.currentLord || 'N/A';
+    tdCurrentLord.textContent = await fetchNameFromURL(house.currentLord);
     tdCurrentLord.classList.add('change-highlight');
 
     const tdHeir = document.createElement('td');
-    tdHeir.textContent = house.heir || 'N/A';
+    tdHeir.textContent = await fetchNameFromURL(house.heir);
     tdHeir.classList.add('change-highlight');
 
     const tdOverlord = document.createElement('td');
-    tdOverlord.textContent = house.overlord || 'N/A';
+    tdOverlord.textContent = await fetchNameFromURL(house.overlord);
     tdOverlord.classList.add('change-highlight');
 
+    // Fondată și fondator
     const tdFounded = document.createElement('td');
     tdFounded.textContent = house.founded || 'N/A';
     tdFounded.classList.add('change-highlight');
@@ -99,14 +129,16 @@ function displayHouse(house) {
     tdFounder.textContent = house.founder || 'N/A';
     tdFounder.classList.add('change-highlight');
 
+    // Arrays de URL-uri
     const tdCadetBranches = document.createElement('td');
-    tdCadetBranches.textContent = house.cadetBranches.length ? house.cadetBranches.join(', ') : 'N/A';
+    tdCadetBranches.textContent = await fetchNamesFromURLs(house.cadetBranches);
     tdCadetBranches.classList.add('change-highlight');
 
     const tdSwornMembers = document.createElement('td');
-    tdSwornMembers.textContent = house.swornMembers.length ? house.swornMembers.join(', ') : 'N/A';
+    tdSwornMembers.textContent = await fetchNamesFromURLs(house.swornMembers);
     tdSwornMembers.classList.add('change-highlight');
 
+    // Adăugăm toate td-urile în tr
     tr.append(
         tdSymbol, tdName, tdRegion, tdWords, tdTitles,
         tdSeats, tdCurrentLord, tdHeir, tdOverlord,
@@ -115,14 +147,14 @@ function displayHouse(house) {
 
     tableBody.appendChild(tr);
 
-    // Eliminăm clasa de highlight după un delay pentru efect tranzitional
+    // Eliminăm clasa highlight după un delay pentru efect tranzitional
     setTimeout(() => {
         const tds = tr.querySelectorAll('.change-highlight');
         tds.forEach(td => td.classList.remove('change-highlight'));
     }, 800);
 }
 
-// Funcție pentru a selecta o casă aleatorie
+// Afișează o casă aleatorie
 function showRandomHouse() {
     if (!allHouses.length) return;
     const randomIndex = Math.floor(Math.random() * allHouses.length);
@@ -131,11 +163,11 @@ function showRandomHouse() {
     displayHouse(house);
 }
 
-// Initializare: preluăm toate casele
+// Inițializare aplicație
 async function init() {
     allHouses = await fetchAllHouses();
     if (allHouses.length) {
-        showRandomHouse(); // afișăm prima casă la încărcarea paginii
+        showRandomHouse(); // prima casă la încărcarea paginii
     } else {
         tableBody.innerHTML = '<tr><td colspan="13">Nu s-au găsit case.</td></tr>';
     }
